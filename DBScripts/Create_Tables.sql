@@ -1,0 +1,65 @@
+CREATE TABLE "BTS"."USERS" 
+   (	"USERNAME" VARCHAR2(50 BYTE), 
+	"PASSWORD" VARCHAR2(20 BYTE)
+   );
+----------------------------------------------------------------------
+
+CREATE TABLE "BTS"."BOOKS" 
+   (	"BOOK_ID" NUMBER(7,0), 
+	"BOOK_NAME" VARCHAR2(50 BYTE), 
+	"BOOK_AUTHOR" VARCHAR2(50 BYTE), 
+	"BOOK_PUBLISHER" VARCHAR2(50 BYTE), 
+	"BOOK_YEAR" VARCHAR2(50 BYTE), 
+	"BOOK_STATUS" VARCHAR2(50 BYTE), 
+	 CONSTRAINT "BOOK_ID_PK" PRIMARY KEY ("BOOK_ID")
+   ) ;
+
+----------------------------------------------------------------------
+  CREATE TABLE "BTS"."REQUESTS" 
+   (	"REQ_ID" NUMBER(7,0), 
+	"STUDENT_NAME" VARCHAR2(50 BYTE), 
+	"BOOK_ID" NUMBER(7,0), 
+	"REQ_DATE" DATE, 
+	"FIRST_UPLOAD" DATE, 
+	"REQ_STATUS" VARCHAR2(50 BYTE), 
+	"FINAL_UPLOAD" DATE, 
+	"STUDENT_ID" VARCHAR2(50 BYTE), 
+	 CONSTRAINT "REQ_ID_PK" PRIMARY KEY ("REQ_ID"), 
+	 CONSTRAINT "BOOK_ID_FK" FOREIGN KEY ("BOOK_ID") REFERENCES "BTS"."BOOKS" ("BOOK_ID") ENABLE
+   );
+   
+----------------------------------------------------------------------
+CREATE TABLE "BTS"."STUDENT_EMPLOYEES" 
+   (	"EMPLOYEE_ID" NUMBER(7,0), 
+	"EMPLOYEE_NAME" VARCHAR2(50 BYTE), 
+	"EMPLOYEE_EMAIL" VARCHAR2(50 BYTE), 
+	"EMPLOYEE_STATUS" VARCHAR2(50 BYTE), 
+	 CONSTRAINT "EMP_ID_PK" PRIMARY KEY ("EMPLOYEE_ID")
+   ) ;
+
+  CREATE OR REPLACE TRIGGER "BTS"."T" 
+  before
+    delete on STUDENT_EMPLOYEES
+    for each row
+  begin
+    delete from employee_tracking where Employee_Id=:old.Employee_Id;
+  end;
+/
+ALTER TRIGGER "BTS"."T" ENABLE;
+----------------------------------------------------------------------
+
+  CREATE TABLE "BTS"."EMPLOYEE_TRACKING" 
+   (	"TRACKING_ID" NUMBER(7,0), 
+	"REQ_ID" NUMBER(7,0), 
+	"TRAC_DATE" DATE, 
+	"EMPLOYEE_ID" NUMBER(7,0), 
+	 CONSTRAINT "TRAC_ID_PK" PRIMARY KEY ("TRACKING_ID"), 
+	 CONSTRAINT "REQ_ID_FK" FOREIGN KEY ("REQ_ID") REFERENCES "BTS"."REQUESTS" ("REQ_ID") ENABLE, 
+	 CONSTRAINT "EMP_ID_FK" FOREIGN KEY ("EMPLOYEE_ID") REFERENCES "BTS"."STUDENT_EMPLOYEES" ("EMPLOYEE_ID") ENABLE
+   );
+----------------------------------------------------------------------
+
+  
+  CREATE OR REPLACE FORCE VIEW "BTS"."INCOMPLETEREQUEST" ("BOOK_ID", "BOOK_NAME", "REQ_ID", "STUDENT_NAME") AS 
+  select BOOKS.BOOK_ID as BOOK_ID ,BOOK_NAME, REQ_ID,STUDENT_NAME 
+  from BOOKS join REQUESTS on ( BOOKS.BOOK_ID=REQUESTS.BOOK_ID and REQ_STATUS='INCOMPLETE');

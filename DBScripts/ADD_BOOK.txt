@@ -1,0 +1,17 @@
+create or replace PROCEDURE ADD_BOOK 
+(
+  V_NAME IN VARCHAR2 
+, V_AUTHOR IN VARCHAR2 
+, V_PUBLISHER IN VARCHAR2 
+, V_YEAR IN VARCHAR2 
+, V_ID OUT NUMBER 
+) AS 
+BEGIN
+  v_ID:=seq_book_id.nextval();
+  insert into BOOKS values (v_ID,v_NAME,v_AUTHOR,v_PUBLISHER,v_YEAR,'UNAVAILABLE');
+  if SQL%ROWCOUNT >0 then
+    v_ID:=v_ID;
+  else
+    v_ID:=0;
+  end if;
+END ADD_BOOK;
