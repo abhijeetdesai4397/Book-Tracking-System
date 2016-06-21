@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import DAO.*;
 import DataAccess.LoginDA;
 /**
@@ -33,7 +36,8 @@ public class LoginController extends HttpServlet {
 		Login loginObj = new Login();
 		loginObj.setUsername(request.getParameter("username"));
 		loginObj.setPassword(request.getParameter("password"));
-		LoginDA loginDA=new LoginDA();
+		ApplicationContext context= new ClassPathXmlApplicationContext("Beans.xml");
+		LoginDA loginDA=(LoginDA)context.getBean("loginDA");
 		if(loginDA.checkLogin(loginObj))
 		{
 			HttpSession session=request.getSession(true);
@@ -43,5 +47,4 @@ public class LoginController extends HttpServlet {
 		else
 			response.sendRedirect("pages/login.jsp");
 	}
-
 }
