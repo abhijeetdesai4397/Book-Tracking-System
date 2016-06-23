@@ -13,7 +13,8 @@ import DAO.Book;
 import DAO.RequestInfo;
 import DataAccess.BookDA;
 import DataAccess.RequestDA;
-
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Servlet implementation class BookSearchController
  */
@@ -34,6 +35,7 @@ public class BookSearchController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		ApplicationContext context=new ClassPathXmlApplicationContext("Beans.xml");
 		response.setContentType("text/html");
 		String page=request.getParameter("book");
 		System.out.println(page);
@@ -45,7 +47,7 @@ public class BookSearchController extends HttpServlet {
 			book.setBookPublisher(request.getParameter("publisher"));
 			book.setBookYear(request.getParameter("year"));
 			
-			BookDA bookDA=new BookDA();
+			BookDA bookDA=(BookDA)context.getBean("bookDA");
 			List<Book> bookList=bookDA.searchBook(book);
 			HttpSession session=request.getSession();
 			session.setAttribute("bookList", bookList);
@@ -59,7 +61,7 @@ public class BookSearchController extends HttpServlet {
 			requestInfo.setStudentId(request.getParameter("studentid"));
 			requestInfo.setStudentName(request.getParameter("studentname"));
 			
-			BookDA bookDA=new BookDA();
+			BookDA bookDA=(BookDA)context.getBean("bookDA");
 			bookDA.addRequest(requestInfo);
 			response.sendRedirect("pages/searchBook.html");
 		}
